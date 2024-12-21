@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { configValidationSchema } from './config.schema';
 import { UserManagementModule } from './user-management/user-management.module';
+import { ProductManagementModule } from './product-management/product-management.module';
+import { AnalyticsManagementModule } from './analytics-management/analytics-management.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { UserManagementModule } from './user-management/user-management.module';
         }) as any,
     }),
     UserManagementModule,
+    ProductManagementModule,
+    AnalyticsManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

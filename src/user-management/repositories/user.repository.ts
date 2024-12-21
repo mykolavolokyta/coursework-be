@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { User } from './user.entity';
+import { User } from '../entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { IUserInfo } from 'src/auth/interfaces';
 import { AuthRoles } from 'src/auth/authRoles.enum';
@@ -24,9 +24,7 @@ export class UserRepository extends Repository<User> {
       email: userInfo.email,
       role: userInfo[this.jwtRolesKey] ?? [AuthRoles.WORKER],
       username: '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    } as User);
+    } as Partial<User>);
     try {
       await this.save(user);
       return user;

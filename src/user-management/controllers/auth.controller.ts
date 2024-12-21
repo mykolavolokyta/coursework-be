@@ -1,10 +1,10 @@
 import { Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserService } from './user.service';
-import { JwtAuthGuard } from '../auth/jwt.auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { UserInfo } from '../auth/user-info.decorator';
-import { IUserInfo } from '../auth/interfaces';
+import { UserService } from '../services/user.service';
+import { JwtAuthGuard } from '../../auth/jwt.auth.guard';
+import { RolesGuard } from '../../auth/roles.guard';
+import { UserInfo } from '../../auth/user-info.decorator';
+import { IUserInfo } from '../../auth/interfaces';
 
 @ApiTags('Auth')
 @Controller('auth')

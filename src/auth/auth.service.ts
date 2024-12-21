@@ -15,6 +15,7 @@ export class AuthService {
   private managementClient: ManagementClient<AppMetadata, UserMetadata>;
   private authClient: AuthenticationClient;
   private roles: Role[];
+
   constructor(private readonly configService: ConfigService) {
     this.managementClient = new ManagementClient({
       domain: configService.get('AUTH0_DOMAIN'),
@@ -34,15 +35,15 @@ export class AuthService {
     });
   }
 
-  async setWorkerRoleToUser(email: string): Promise<void> {
+  async setAdminRoleToUser(email: string): Promise<void> {
     try {
       const [user] = await this.managementClient.getUsersByEmail(email);
-      const employeeRole = this.roles.find(
-        (role) => role.name === AuthRoles.WORKER,
+      const adminRole = this.roles.find(
+        (role) => role.name === AuthRoles.ADMIN,
       );
       await this.managementClient.assignRolestoUser(
         { id: user.user_id },
-        { roles: [employeeRole.id] },
+        { roles: [adminRole.id] },
       );
     } catch (e) {
       console.log(e);
@@ -50,7 +51,30 @@ export class AuthService {
     }
   }
 
-  async setViewerRoleToUser(email: string): Promise<void> {
+  async setWorkerRoleToUser(email: string): Promise<void> {
+    try {
+      const [user] = await this.managementClient.getUsersByEmail(email);
+      const workerRole = this.roles.find(
+        (role) => role.name === AuthRoles.WORKER,
+      );
+      const adminRole = this.roles.find(
+        (role) => role.name === AuthRoles.ADMIN,
+      );
+      await this.managementClient.removeRolesFromUser(
+        { id: user.user_id },
+        { roles: [adminRole.id] },
+      );
+      await this.managementClient.assignRolestoUser(
+        { id: user.user_id },
+        { roles: [workerRole.id] },
+      );
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  async removeRoleFromUser(email: string): Promise<void> {
     try {
       const [user] = await this.managementClient.getUsersByEmail(email);
       await this.managementClient.removeRolesFromUser(
