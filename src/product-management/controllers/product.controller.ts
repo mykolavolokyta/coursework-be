@@ -4,7 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  Post, Put,
+  Post, Put, Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -33,8 +33,8 @@ export class ProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(AuthRoles.WORKER, AuthRoles.ADMIN)
   @Get('all')
-  async getUsers() {
-    return this.productService.findAll();
+  async getUsers(@Query('search') search?: string) {
+    return this.productService.findAll(search);
   }
 
   @ApiBearerAuth()

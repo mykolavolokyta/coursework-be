@@ -1,7 +1,8 @@
 import {
   Column,
   CreateDateColumn,
-  Entity, ManyToOne,
+  Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -9,9 +10,9 @@ import { ShipmentItem } from './shipment-item.entity';
 import { User } from '../../user-management/entities/user.entity';
 
 export enum ShipmentStatus {
-  SHIPPED = 'Shipped',
   PENDING = 'Pending',
   DELIVERED = 'Delivered',
+  LOST = 'Lost',
 }
 
 @Entity()

@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateShipmentDto } from '../dto/create-shipment.dto';
-import { Shipment } from '../entities/shipment.entity';
+import { Shipment, ShipmentStatus } from '../entities/shipment.entity';
 import { Product } from '../entities/product.entity';
 import { ShipmentItem } from '../entities/shipment-item.entity';
 import { IUserInfo } from '../../auth/interfaces';
@@ -140,6 +140,16 @@ export class ShipmentService {
     const page = pdfDoc.addPage([600, 400]);
     const { height } = page.getSize();
 
+    const mapStatus = (status: string) => {
+      if (status === 'Pending') {
+        return 'В очікуванні';
+      }
+      if (status === 'Delivered') {
+        return 'Доставлено';
+      }
+      return 'Втрачено';
+    };
+
     page.drawText(`Накладна: Відправлення №${shipment.id}`, {
       x: 50,
       y: height - 50,
@@ -164,7 +174,7 @@ export class ShipmentService {
       },
     );
 
-    page.drawText(`Статус: ${shipment.status}`, {
+    page.drawText(`Статус: ${mapStatus(shipment.status)}`, {
       x: 50,
       y: height - 140,
       size: 14,
@@ -253,5 +263,20 @@ export class ShipmentService {
 
     pdfDoc.removePage(0);
     return await pdfDoc.save();
+  }
+
+  async updateShipmentStatus(
+    id: number,
+    status: ShipmentStatus,
+  ): Promise<Shipment | null> {
+    const shipment = await this.shipmentRepository.findOne({ where: { id } });
+
+    if (!shipment) {
+      return null;
+    }
+
+    shipment.status = status;
+    await this.shipmentRepository.save(shipment);
+    return shipment;
   }
 }

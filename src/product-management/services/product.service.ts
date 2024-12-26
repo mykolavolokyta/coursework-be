@@ -4,8 +4,6 @@ import { Product } from '../entities/product.entity';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ProductRepository } from '../repositories/product.repository';
 
-//import { UpdateProductDto } from '../dto/update-product.dto';
-
 @Injectable()
 export class ProductService {
   constructor(
@@ -18,8 +16,18 @@ export class ProductService {
     return await this.productRepository.save(product);
   }
 
-  async findAll(): Promise<Product[]> {
-    return await this.productRepository.find();
+  async findAll(search?: string): Promise<Product[]> {
+    const queryBuilder = this.productRepository.createQueryBuilder('product');
+
+    if (search) {
+      queryBuilder.where(
+        'product.name ILIKE :search OR product.id::text ILIKE :search OR product.category ILIKE :search',
+        { search: `%${search}%` },
+      );
+    }
+    queryBuilder.orderBy('product.id', 'ASC');
+
+    return queryBuilder.getMany();
   }
 
   async findOne(id: number): Promise<Product> {

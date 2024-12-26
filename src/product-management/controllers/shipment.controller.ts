@@ -4,7 +4,7 @@ import {
   Get,
   NotFoundException,
   Param,
-  Post,
+  Post, Put,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -18,6 +18,7 @@ import { CreateShipmentDto } from '../dto/create-shipment.dto';
 import { UserInfo } from '../../auth/user-info.decorator';
 import { IUserInfo } from '../../auth/interfaces';
 import { Response } from 'express';
+import { UpdateShipmentStatusDto } from '../dto/update-shipment-status.dto';
 
 @ApiTags('Shipment')
 @Controller('shipment')
@@ -64,5 +65,25 @@ export class ShipmentController {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=invoice.pdf');
     res.send(Buffer.from(pdfBytes));
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(AuthRoles.WORKER, AuthRoles.ADMIN)
+  @Put(':id/status')
+  async updateShipmentStatus(
+    @Param('id') id: number,
+    @Body() updateShipmentStatusDto: UpdateShipmentStatusDto,
+  ) {
+    const updatedShipment = await this.shipmentService.updateShipmentStatus(
+      id,
+      updateShipmentStatusDto.status,
+    );
+
+    if (!updatedShipment) {
+      throw new NotFoundException('Shipment not found');
+    }
+
+    return updatedShipment;
   }
 }
